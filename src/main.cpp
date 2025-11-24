@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 //Canny
 #define WHITE 255
 #define BLACK 0
