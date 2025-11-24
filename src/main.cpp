@@ -10,10 +10,6 @@
 
 using namespace std;
 
-//Grayscale 
-#define RED_WEIGHT   0.2989
-#define GREEN_WEIGHT 0.5870
-#define BLUE_WEIGHT  0.1140
 
 //Canny
 #define WHITE 255
@@ -24,21 +20,13 @@ using namespace std;
 #define CANNY 0.25
 #define M_PI 3.14159265358979323846
 
-//FloyedSteinberg
-#define COMPRESSED 16
-#define ALPHA 7/16.0
-#define BETA 3/16.0
-#define GAMMA 5/16.0
-#define DELTA 1/16.0
-
-
 
 //1.Grayscale
 unsigned char* toGrayscale(unsigned char* img, int width, int height){
     unsigned char* gray = new unsigned char[width * height];
     for (int i = 0; i < width * height; i++){
         int idx = i * 4;
-        gray[i] = img[idx] * RED_WEIGHT + img[idx + 1] * GREEN_WEIGHT + img[idx + 2] * BLUE_WEIGHT;
+        gray[i] = img[idx] * 0.2989 + img[idx + 1] * 0.5870 + img[idx + 2] * 0.1140;
     }
     return gray;
 }
@@ -230,7 +218,7 @@ unsigned char* applyCanny(unsigned char* gray, int w, int h)
 
     // a. Gradient
     computeGradient(fBuffer, w, h, blurred, xConv, yConv, gradient, angles, CANNY);
-    stbi_write_png("res/textures/2.1.Canny_Gradient.png", w, h, 1, gradient, w);
+    stbi_write_png("bin/res/textures/2.1.Canny_Gradient.png", w, h, 1, gradient, w);
 
     // b. Non-Max Suppression
     nonMaxSuppression(gradient, angles, nmsOutput, w, h);
@@ -336,7 +324,7 @@ unsigned char *floyedSteinberg(unsigned char *buffer, int width, int height,floa
             int idx = y*width + x;
 
             unsigned char oldP = diff[idx];
-            unsigned char newP = (unsigned char)((oldP / 255.0 * COMPRESSED) / COMPRESSED * 255.0);
+            unsigned char newP = (unsigned char)((oldP / 255.0 * 16) / 16 * 255.0);
             result[idx] = newP;
 
             float error = oldP - newP;
@@ -446,7 +434,7 @@ int main()
     // saveHalftone("Halftone.txt", halftoneBuff, w*2, h*2);
 
     // 4. FloydSteinberg
-    unsigned char *fs = floyedSteinberg(gray, w, h, ALPHA, BETA, GAMMA, DELTA);
+    unsigned char *fs = floyedSteinberg(gray, w, h, 7/16.0, 3/16.0, 5/16.0, 1/16.0);
     stbi_write_png("res/textures/4.FloydSteinberg.png", w, h, 1, fs, w);
     // saveFloyd("FloyedSteinberg.txt", fs, w, h);
 
